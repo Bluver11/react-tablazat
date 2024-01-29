@@ -112,13 +112,21 @@ function App() {
                 }}>
                   Remove
                   </button>
-                  <button className='btn btn-success'
+                  <button className='btn btn-primary'
                   onClick={()=>{
                     const index = people.indexOf(person)
                     const newPeople = cloneDeep(people)
                     newPeople[index].age++
                     setPeople(newPeople) 
                   
+                /* const index = people.indexOf(person)
+                 const newPeople = Array.from(people)
+                 const newPerson = {
+                  ...person,
+                  age: person.age+1
+                 };
+                 newPeople[index] = newPerson;
+                 setPeople(newPeople)*/
                   }}>
                     Age++ 🍰
                   </button>
