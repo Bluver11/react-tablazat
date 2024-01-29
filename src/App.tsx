@@ -1,79 +1,101 @@
-import { useState } from 'react';
-import './App.css'
+import { useEffect, useState } from 'react';
+import './App.css';
 
-const people = [ 
-    {"id": 1, "name": "John", "age": 25, "city": "New York"},
-{"id": 2, "name": "Alice", "age": 30, "city": "San Francisco"},
-{"id": 3, "name": "Bob", "age": 28, "city": "Los Angeles"},
-{"id": 4, "name": "Emily", "age": 22, "city": "Chicago"},
-{"id": 5, "name": "Michael", "age": 35, "city": "Seattle"},
-{"id": 6, "name": "Sophia", "age": 27, "city": "Boston"},
-{"id": 7, "name": "David", "age": 31, "city": "Miami"},
-{"id": 8, "name": "Olivia", "age": 26, "city": "Austin"},
-{"id": 9, "name": "Daniel", "age": 29, "city": "Denver"},
-{"id": 10, "name": "Ella", "age": 24, "city": "Portland"}
-]
+
+
 
 
 
 function App() {
 
-    const [searchTerm, setSearchTerm] = useState('');
-    const [sortOrder, setSortOrder] = useState('asc');
-  
-    const handleSearch = (e) => {
-      setSearchTerm(e.target.value);
-    };
-  
-    const handleSort = (e) => {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    };
-  
+  console.log('App render')
+  const [people,setPeople] = useState([])
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortOrder, setSortOrder] = useState('asc');
+  const [errorMessage, setErrorMessage] = useState('');
 
-    const filteredPeople = people.filter((person) =>
-      person.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+  //Use case 1: komponens beöltéskor fusson le
+  useEffect(()=>{
+   async function load(){
+    try{
+     const response = await fetch('/people.json');
+     if(!response.ok){
+        setErrorMessage('Hiba a letöltéskor')
+        return;
+     }
+     const content = await response.json();
+     setPeople(content);
+    }catch{
+      setErrorMessage('Hiba a letöltéskor')
+    }
+   }
+   load();
+  },[])
 
-    const sortedPeople = filteredPeople.sort((a, b) => {
-      if (a.name < b.name) {
-        return sortOrder === 'asc' ? -1 : 1;
-      }
-      if (a.name > b.name) {
-        return sortOrder === 'asc' ? 1 : -1;
-      }
-      return 0;
-    });
 
-  
-    return (
-      <div className="container">
-        <h1>People</h1>
+
+
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handleSort = (e) => {
+    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+  };
+
+
+  const filteredPeople = people.filter((person) =>
+    person.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const sortedPeople = filteredPeople.sort((a, b) => {
+    if (a.name < b.name) {
+      return sortOrder === 'asc' ? -1 : 1;
+    }
+    if (a.name > b.name) {
+      return sortOrder === 'asc' ? 1 : -1;
+    }
+    return 0;
+  });
+
+  useEffect(()=>{
+    document.title = `People (${sortedPeople.length}) `;
+
+  },[sortedPeople.length])
+  return (
+    <div className="container">
+      <h1>People</h1>
+      <label>
+        Search by name:
+        <br />
         <input
           type="text"
-          placeholder="Search by name"
           value={searchTerm}
           onChange={handleSearch}
         />
-        <table>
-          <thead>
-            <tr>
-              <th onClick={handleSort}>Name</th>
-              <th onClick={handleSort}>Age</th>
-              <th>City</th>
+      </label>
+      <table className='table table-striped table-hover'>
+        <thead>
+          <tr>
+            <th onClick={handleSort} className='sortable'>Name
+              {}</th >
+            <th>Age</th>
+            <th>City</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sortedPeople.map((person) => (
+            <tr key={person.id}>
+              <td>{person.name}</td>
+              <td>{person.age}</td>
+              <td>{person.city}</td>
             </tr>
-          </thead>
-          <tbody>
-            {sortedPeople.map((person) => (
-              <tr key={person.id}>
-                <td>{person.name}</td>
-                <td>{person.age}</td>
-                <td>{person.city}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 
 
 
