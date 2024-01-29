@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import './App.css';
+import { Person } from './Person';
+import { cloneDeep } from 'lodash';
 
 
 
@@ -9,7 +11,7 @@ import './App.css';
 function App() {
 
   console.log('App render')
-  const [people,setPeople] = useState([])
+  const [people,setPeople] = useState([] as Person[])
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
   const [errorMessage, setErrorMessage] = useState('');
@@ -23,7 +25,7 @@ function App() {
         setErrorMessage('Hiba a letöltéskor')
         return;
      }
-     const content = await response.json();
+     const content = await response.json() as Person[];
      setPeople(content);
     }catch{
       setErrorMessage('Hiba a letöltéskor')
@@ -59,6 +61,8 @@ function App() {
     return 0;
   });
 
+
+  //USe case 2: változó megváltozásakor fusson le
   useEffect(()=>{
     document.title = `People (${sortedPeople.length}) `;
 
@@ -66,6 +70,7 @@ function App() {
   return (
     <div className="container">
       <h1>People</h1>
+      <div className='alert danger-alert'>{errorMessage}</div>
       <label>
         Search by name:
         <br />
@@ -82,14 +87,42 @@ function App() {
               {}</th >
             <th>Age</th>
             <th>City</th>
+            <th>Operations</th>
           </tr>
         </thead>
         <tbody>
-          {sortedPeople.map((person) => (
+          {sortedPeople.map((person,i) => (
             <tr key={person.id}>
               <td>{person.name}</td>
               <td>{person.age}</td>
               <td>{person.city}</td>
+              <td>
+                <button className='btn btn-danger'
+                onClick={()=> {
+                  //AZ elem indexe, mert a rendezett tömb != az eredeti tömbbel
+                  const index = people.indexOf(person)
+                  //Mássoljuk is
+                  const newPeople = Array.from(people)
+                  // TTöröljük az index-edik elemet
+                  newPeople.splice(index,1)
+                  //Tároljuk el
+                  setPeople(newPeople)
+                  //Új böngészőkben ez is mükődik, de VS code nem ad kiegészítést
+                  //setPeople(people.toSplice(index,1))
+                }}>
+                  Remove
+                  </button>
+                  <button className='btn btn-success'
+                  onClick={()=>{
+                    const index = people.indexOf(person)
+                    const newPeople = cloneDeep(people)
+                    newPeople[index].age++
+                    setPeople(newPeople) 
+                  
+                  }}>
+                    Age++ 🍰
+                  </button>
+              </td>
             </tr>
           ))}
         </tbody>
