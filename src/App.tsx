@@ -20,7 +20,7 @@ function App() {
   useEffect(()=>{
    async function load(){
     try{
-     const response = await fetch('/people.json');
+     const response = await fetch('http://localhost:3000/people');
      if(!response.ok){
         setErrorMessage('Hiba a letöltéskor')
         return;
