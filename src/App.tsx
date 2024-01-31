@@ -47,7 +47,7 @@ function App() {
   };
 
 
-  const filteredPeople = people.filter((person) =>
+  const filteredPeople = people.filter((person) => person.id === parseInt(searchTerm)||
     person.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -72,7 +72,7 @@ function App() {
       <h1>People</h1>
       <div className='alert danger-alert'>{errorMessage}</div>
       <label>
-        Search by name:
+        Search by name or ID:
         <br />
         <input
           type="text"
